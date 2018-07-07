@@ -56,7 +56,7 @@ class Swoole extends Server
         $server->send($frame->fd, json_encode($res));
     }
 
-    public function onClose($server, $fd, $from_id, $data)
+    public function onClose($server, $fd)
     {
         echo "onClose..." . PHP_EOL;
     }
@@ -67,7 +67,7 @@ class Swoole extends Server
         $server->send($fd, 'onClose: ' . $data);
     }
 
-    public function onFinish($server, $fd, $from_id, $data)
+    public function onFinish($server, $task_id, $data)
     {
         echo "onFinish..." . PHP_EOL;
     }
