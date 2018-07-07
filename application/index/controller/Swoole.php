@@ -38,7 +38,7 @@ class Swoole extends Server
         echo $uid.PHP_EOL;
         $res = [
             'fd'  => $req->fd,
-            'req' => json_decode(json_encode($req), true),
+            'req' => $req->server['remote_addr'],
             'uid' => $uid,
         ];
         var_dump($req);
@@ -51,7 +51,7 @@ class Swoole extends Server
         $msg = input('msg', 'no msg');
         $res = [
             'fd'      => $frame->fd,
-            'from_id' => json_decode(json_encode($frame), true),
+            'from_id' => $frame->data,
             'data'    => $frame->data,
             'action'  => 'onMessage',
             'msg'     => $msg
