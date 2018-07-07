@@ -35,16 +35,19 @@ class Swoole extends Server
     public function onOpen($server, $req)
     {
         $uid = input('uid', 0);
+        echo $uid.PHP_EOL;
         $res = [
             'fd'  => $req->fd,
             'req' => json_decode(json_encode($req), true),
             'uid' => $uid,
         ];
+        var_dump($req);
         $server->send($req->fd, json_encode($res));
     }
 
     public function onMessage($server, $frame)
     {
+        var_dump($frame);
         $msg = input('msg', 'no msg');
         $res = [
             'fd'      => $frame->fd,
