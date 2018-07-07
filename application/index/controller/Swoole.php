@@ -34,7 +34,7 @@ class Swoole extends Server
 
     public function onOpen($server, $req)
     {
-        $uid = input('uid', 0);
+        $uid = $req->get['uid'];
         echo $uid.PHP_EOL;
         $res = [
             'fd'  => $req->fd,
@@ -42,7 +42,7 @@ class Swoole extends Server
             'uid' => $uid,
         ];
         var_dump($req);
-        $server->send($req->fd, json_encode($res));
+        $server->push($req->fd, json_encode($res));
     }
 
     public function onMessage($server, $frame)
@@ -56,7 +56,7 @@ class Swoole extends Server
             'action'  => 'onMessage',
             'msg'     => $msg
         ];
-        $server->send($frame->fd, json_encode($res));
+        $server->push($frame->fd, json_encode($res));
     }
 
     public function onClose($server, $fd)
@@ -67,7 +67,7 @@ class Swoole extends Server
     public function onTask($server, $fd, $from_id, $data)
     {
         echo "onTask..." . PHP_EOL;
-        $server->send($fd, 'onClose: ' . $data);
+        $server->push($fd, 'onClose: ' . $data);
     }
 
     public function onFinish($server, $task_id, $data)
