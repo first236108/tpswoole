@@ -47,7 +47,7 @@ class Swoole extends Server
 
     public function onMessage($server, $frame)
     {
-        var_dump($frame);
+       var_dump( $frame->data);
         $msg = input('msg', 'no msg');
         $res = [
             'fd'      => $frame->fd,
