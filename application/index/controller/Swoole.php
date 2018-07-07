@@ -14,13 +14,14 @@ class Swoole extends Server
 {
     protected $host = 'igccc.com';
     protected $port = 9502;
+    protected $serverType = 'socket';
     protected $option = [
         'worker_num'      => 4,
         'max_request'     => 1000,
         'max_conn'        => 5000,
         'task_worker_num' => 200,
         'backlog'         => 128,
-        'daemonize'       => true,
+        'daemonize'       => false,
     ];
 
     public function onReceive($server, $fd, $from_id, $data)
@@ -45,5 +46,16 @@ class Swoole extends Server
     {
         echo "onClose...".PHP_EOL;
         $server->send($fd, 'Swoole: ' . $data);
+    }
+
+    public function onTask($server, $fd, $from_id, $data)
+    {
+        echo "onTask...".PHP_EOL;
+        $server->send($fd, 'onClose: ' . $data);
+    }
+
+    public function onFinish($server, $fd, $from_id, $data)
+    {
+        echo "onFinish...".PHP_EOL;
     }
 }
