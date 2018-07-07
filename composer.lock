@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "296bd8a1d28e39d56dcd80ce7be249f3",
+    "content-hash": "e0746207bac76c3e7052025b6afbb414",
     "packages": [
         {
             "name": "topthink/framework",
@@ -16,7 +16,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/top-think/framework/833fcaf0f29f23bdceaae655f64d10c18b9bf562.zip",
+                "url": "https://api.github.com/repos/top-think/framework/zipball/833fcaf0f29f23bdceaae655f64d10c18b9bf562",
                 "reference": "833fcaf0f29f23bdceaae655f64d10c18b9bf562",
                 "shasum": ""
             },
@@ -67,7 +67,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/top-think/think-installer/f5400a12c60e513911aef41fe443fa6920952675.zip",
+                "url": "https://api.github.com/repos/top-think/think-installer/zipball/f5400a12c60e513911aef41fe443fa6920952675",
                 "reference": "f5400a12c60e513911aef41fe443fa6920952675",
                 "shasum": ""
             },
@@ -97,6 +97,52 @@
                 }
             ],
             "time": "2018-05-11T06:45:42+00:00"
+        },
+        {
+            "name": "topthink/think-swoole",
+            "version": "v2.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/top-think/think-swoole.git",
+                "reference": "72118702019d24269997e1c40eaf48c82e9e3cb9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/top-think/think-swoole/zipball/72118702019d24269997e1c40eaf48c82e9e3cb9",
+                "reference": "72118702019d24269997e1c40eaf48c82e9e3cb9",
+                "shasum": ""
+            },
+            "require": {
+                "ext-swoole": ">=1.9.5",
+                "topthink/framework": "5.1.*",
+                "topthink/think-installer": "^2.0"
+            },
+            "type": "think-extend",
+            "extra": {
+                "think-config": {
+                    "swoole": "src/config.php"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "think\\swoole\\": "src"
+                },
+                "files": [
+                    "src/command.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "liu21st",
+                    "email": "liu21st@gmail.com"
+                }
+            ],
+            "description": "Swoole extend for thinkphp5.1",
+            "time": "2018-07-04T04:15:23+00:00"
         }
     ],
     "packages-dev": [],
