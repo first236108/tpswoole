@@ -22,40 +22,53 @@ class Swoole extends Server
         'task_worker_num' => 200,
         'backlog'         => 128,
         'daemonize'       => false,
+        //'ssl_cert_file'=>,
+        //'ssl_key_file'=>,
     ];
 
     public function onReceive($server, $fd, $from_id, $data)
     {
-        echo "onReceive...".PHP_EOL;
+        echo "onReceive..." . PHP_EOL;
         $server->send($fd, 'Swoole: ' . $data);
     }
 
-    public function onOpen($server, $fd, $from_id, $data)
+    public function onOpen($server, $req)
     {
-        echo "onOpen...".PHP_EOL;
-        $server->send($fd, 'Swoole: ' . $data);
+        $uid = input('uid', 0);
+        $res = [
+            'fd'  => $req->fd,
+            'req' => json_decode(json_encode($req), true),
+            'uid' => $uid,
+        ];
+        $server->send($req->fd, json_encode($res));
     }
 
-    public function onMessage($server, $fd, $from_id, $data)
+    public function onMessage($server, $frame)
     {
-        echo "onMessage...".PHP_EOL;
-        $server->send($fd, 'Swoole: ' . $data);
+        $msg = input('msg', 'no msg');
+        $res = [
+            'fd'      => $frame->fd,
+            'from_id' => json_decode(json_encode($frame), true),
+            'data'    => $frame->data,
+            'action'  => 'onMessage',
+            'msg'     => $msg
+        ];
+        $server->send($frame->fd, json_encode($res));
     }
 
     public function onClose($server, $fd, $from_id, $data)
     {
-        echo "onClose...".PHP_EOL;
-        $server->send($fd, 'Swoole: ' . $data);
+        echo "onClose..." . PHP_EOL;
     }
 
     public function onTask($server, $fd, $from_id, $data)
     {
-        echo "onTask...".PHP_EOL;
+        echo "onTask..." . PHP_EOL;
         $server->send($fd, 'onClose: ' . $data);
     }
 
     public function onFinish($server, $fd, $from_id, $data)
     {
-        echo "onFinish...".PHP_EOL;
+        echo "onFinish..." . PHP_EOL;
     }
 }
