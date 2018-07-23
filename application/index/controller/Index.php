@@ -12,6 +12,7 @@ class Index extends Controller
     {
         return response("<h1>igccc游戏接口</h1>");
     }
+
     public function register()
     {
         #fixme 增加验证码或手机短信
@@ -30,11 +31,13 @@ class Index extends Controller
 
         $row = [
             'mobile'   => $data['phone'],
+            'nickname' => '游客',
             'password' => password_hash($data['phone'], PASSWORD_BCRYPT, ['cost' => 10]),
         ];
 
         $row['user_id'] = Db::name('users')->insertGetId($row);
         if ($row['user_id'] > 0) {
+            unset($row['password']);
             return json($row, 200);
         }
         return json(['msg' => '创建新用户失败，请稍后再试'], 404);
@@ -76,7 +79,7 @@ class Index extends Controller
                 $res = Login::wxLogin($data);
                 break;
             default:
-                return json(['msg' => 'test'], 403);
+                return json(['msg' => '非法请求'], 403);
         }
         return json($res[0], $res[1]);
     }

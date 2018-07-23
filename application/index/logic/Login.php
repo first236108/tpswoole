@@ -19,7 +19,7 @@ class Login extends \think\Controller
             return [['msg' => '用户不存在'], 401];
         }
         if (!password_verify($data['password'], $user['password'])) {
-            return [['msg' => '密码错误'], 401];
+            return [['msg' => '密码错误.'], 401];
         }
         return [$user, 200];
     }
