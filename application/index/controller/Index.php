@@ -32,7 +32,7 @@ class Index extends Controller
         $row = [
             'mobile'   => $data['phone'],
             'nickname' => '游客',
-            'password' => password_hash($data['phone'], PASSWORD_BCRYPT, ['cost' => 10]),
+            'password' => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 10]),
         ];
 
         $row['user_id'] = Db::name('users')->insertGetId($row);
@@ -45,10 +45,8 @@ class Index extends Controller
 
     public function login()
     {
-
         $type = input('post.type', 0);
         $data = input('post.');
-
         switch ($type) {
             case 1:
                 $result = $this->validate($data, [
