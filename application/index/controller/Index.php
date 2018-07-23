@@ -8,6 +8,10 @@ use app\index\logic\Login;
 
 class Index extends Controller
 {
+    public function index()
+    {
+        return response("<h1>igccc游戏接口</h1>");
+    }
     public function register()
     {
         #fixme 增加验证码或手机短信
