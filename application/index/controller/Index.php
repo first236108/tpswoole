@@ -1,15 +1,79 @@
 <?php
+
 namespace app\index\controller;
 
-class Index
+use think\Controller;
+use think\Db;
+use app\index\logic\Login;
+
+class Index extends Controller
 {
-    public function index()
+    public function register()
     {
-        return '<style type="text/css">*{ padding: 0; margin: 0; } div{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:) </h1><p> ThinkPHP V5.1<br/><span style="font-size:30px">12载初心不改（2006-2018） - 你值得信赖的PHP框架</span></p></div><script type="text/javascript" src="https://tajs.qq.com/stats?sId=64890268" charset="UTF-8"></script><script type="text/javascript" src="https://e.topthink.com/Public/static/client.js"></script><think id="eab4b9f840753f8e7"></think>';
+        #fixme 增加验证码或手机短信
+        $data   = input('post.');
+        $result = $this->validate($data, [
+            'phone'    => 'require|mobile',
+            'password' => 'require|length:6,32'
+        ], [
+            'phone.require'    => '手机号必须填写',
+            'phone.mobile'     => '手机号错误',
+            'password.require' => '密码必须填写',
+        ]);
+        if ($result !== true) {
+            return json(['msg' => $result], 401);
+        }
+
+        $row = [
+            'mobile'   => $data['phone'],
+            'password' => password_hash($data['phone'], PASSWORD_BCRYPT, ['cost' => 10]),
+        ];
+
+        $row['user_id'] = Db::name('users')->insertGetId($row);
+        if ($row['user_id'] > 0) {
+            return json($row, 200);
+        }
+        return json(['msg' => '创建新用户失败，请稍后再试'], 404);
     }
 
-    public function hello($name = 'ThinkPHP5')
+    public function login()
     {
-        return 'hello,' . $name;
+
+        $type = input('post.type', 0);
+        $data = input('post.');
+
+        switch ($type) {
+            case 1:
+                $result = $this->validate($data, [
+                    'phone'    => 'require|mobile',
+                    'password' => 'require|length:6,32'
+                ], [
+                    'phone.require'    => '手机号必须填写',
+                    'phone.mobile'     => '手机号错误',
+                    'password.require' => '密码必须填写',
+                    'phone.length'     => '密码错误',
+                ]);
+                if ($result !== true) {
+                    return json(['msg' => $result], 401);
+                }
+                $res = Login::phoneLogin($data);
+                break;
+            case 2:
+                $result = $this->validate($data, [
+
+                ], [
+
+                ]);
+
+                if ($result !== true) {
+                    return json(['msg' => $result], 401);
+                }
+
+                $res = Login::wxLogin($data);
+                break;
+            default:
+                return json(['msg' => 'test'], 403);
+        }
+        return json($res[0], $res[1]);
     }
 }
