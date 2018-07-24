@@ -47,12 +47,17 @@ class Index extends Controller
     {
         $type = input('post.type', 0);
         $data = input('post.');
+        $str  = implode('|', array_keys(config('from')));
+
         switch ($type) {
             case 1:
                 $result = $this->validate($data, [
+                    'from'     => ['require', 'regex' => '/(' . $str . ')/'],
                     'phone'    => 'require|mobile',
                     'password' => 'require|length:6,32'
                 ], [
+                    'from.require'     => '登录源不能为空',
+                    'from.regex'       => '登录源错误',
                     'phone.require'    => '手机号必须填写',
                     'phone.mobile'     => '手机号错误',
                     'password.require' => '密码必须填写',

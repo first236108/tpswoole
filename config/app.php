@@ -142,5 +142,20 @@ return [
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle'       => '',
-
+    'from'                   => [
+        'wx'      => '微信',
+        'h5'      => '网页',
+        'android' => '安卓',
+        'ios'     => 'apple',
+    ],
+    'redis'=>[
+        'host'       => '127.0.0.1',
+        'port'       => 6379,
+        'password'   => 'b840fc02d524045429941cc15f59e41cb7be%c*2',
+        'select'     => 0,
+        'timeout'    => 0,
+        'expire'     => 0,
+        'persistent' => false,
+        'prefix'     => '',
+    ]
 ];

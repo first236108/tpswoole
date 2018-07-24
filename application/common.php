@@ -10,3 +10,15 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
+function getIp()
+{
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORVARDED_FOR'])) {
+        return $_SERVER['HTTP_X_FORVARDED_FOR'];
+    } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+        return $_SERVER['REMOTE_ADDR'];
+    } else {
+        return false;
+    }
+}
