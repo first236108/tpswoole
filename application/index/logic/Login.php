@@ -10,18 +10,15 @@ namespace app\index\logic;
 
 use think\Db;
 
-class Login extends \think\Controller
+class Login
 {
     protected $conf;
     protected $redis;
     protected static $user = [];
-    protected $beforeActionList = [
-        'check',
-    ];
 
-    protected function check()
+    protected function __construct()
     {
-        if ($redis = '') {
+        if (!$this->redis) {
             $this->redis = $this->redis_connect();
         }
 
