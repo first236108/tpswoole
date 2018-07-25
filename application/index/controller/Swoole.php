@@ -23,7 +23,7 @@ class Swoole extends Server
         'max_conn'        => 5000,
         'task_worker_num' => 200,
         'backlog'         => 128,
-        'daemonize'       => true,
+        'daemonize'       => false,
         //'ssl_cert_file'=>,
         //'ssl_key_file'=>,
     ];
@@ -31,7 +31,7 @@ class Swoole extends Server
     public function __construct()
     {
         parent::__construct();
-        $this->game=new Game();
+        $this->game = new Game();
     }
 
     public function onReceive($server, $fd, $from_id, $data)
@@ -49,27 +49,24 @@ class Swoole extends Server
         if ($res['ret'] == 1) {
             //$server->close($req->fd);
         }
-        $mode=$this->game->getMode();
+        $mode = $this->game->getMode();
         $server->push($req->fd, json_encode($mode));
     }
 
     public function onMessage($server, $frame)
     {
-        var_dump($server);
-        echo '-----'.PHP_EOL;
-        var_dump($frame);
-        echo '-----'.PHP_EOL;
-        $msg    = input('msg', 'no msg');
-        $res    = [
+        var_dump(json_decode($frame->data,true));
+        echo '-----' . PHP_EOL;
+        $msg = input('msg', 'no msg');
+        $res = [
             'fd'      => $frame->fd,
-            'from_id' => $frame->data,
             'data'    => $frame->data,
             'action'  => 'onMessage',
             'msg'     => $msg
         ];
-var_dump($res);
+        var_dump($res);
         $result = $this->game->indexList();
-        $server->push($frame->fd, json_encode([$res,$result]));
+        $server->push($frame->fd, json_encode([$res, $result]));
     }
 
     public function onClose($server, $fd)
