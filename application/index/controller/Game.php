@@ -21,14 +21,21 @@ class Game
             $this->indexRedis = $this->redis_connect(1);
         }
         if (!$this->indexRedis->exists('indexlist')) {
+            $mode = config('gamemode');
             $list = Db::name('list')->select();
-            $this->indexRedis->set('indexlist', $list);
+            $this->indexRedis->set('indexlist', json_encode($list));
+            $this->indexRedis->set('mode', json_encode($mode));
         }
     }
 
     public function indexList()
     {
         return $this->indexRedis->get('indexlist');
+    }
+
+    public function getMode()
+    {
+        return $this->indexRedis->get('mode');
     }
 
     private function redis_connect($db = 1)

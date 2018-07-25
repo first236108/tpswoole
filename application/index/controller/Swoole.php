@@ -13,6 +13,7 @@ use app\index\logic\Login;
 
 class Swoole extends Server
 {
+    protected $game;
     protected $host = 'igccc.com';
     protected $port = 9502;
     protected $serverType = 'socket';
@@ -22,10 +23,16 @@ class Swoole extends Server
         'max_conn'        => 5000,
         'task_worker_num' => 200,
         'backlog'         => 128,
-        'daemonize'       => false,
+        'daemonize'       => true,
         //'ssl_cert_file'=>,
         //'ssl_key_file'=>,
     ];
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->game=new Game();
+    }
 
     public function onReceive($server, $fd, $from_id, $data)
     {
@@ -40,13 +47,18 @@ class Swoole extends Server
 
         $res = Login::checkToken($token, $from);
         if ($res['ret'] == 1) {
-            $server->close($req->fd);
+            //$server->close($req->fd);
         }
-        $server->push($req->fd, json_encode($res));
+        $mode=$this->game->getMode();
+        $server->push($req->fd, json_encode($mode));
     }
 
     public function onMessage($server, $frame)
     {
+        var_dump($server);
+        echo '-----'.PHP_EOL;
+        var_dump($frame);
+        echo '-----'.PHP_EOL;
         $msg    = input('msg', 'no msg');
         $res    = [
             'fd'      => $frame->fd,
@@ -55,8 +67,8 @@ class Swoole extends Server
             'action'  => 'onMessage',
             'msg'     => $msg
         ];
-
-        $result = (new Game())->indexList();
+var_dump($res);
+        $result = $this->game->indexList();
         $server->push($frame->fd, json_encode([$res,$result]));
     }
 
