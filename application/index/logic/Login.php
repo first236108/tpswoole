@@ -42,9 +42,10 @@ class Login
             return [['msg' => '您的账户因' . $user['lock_note'] . '已被锁定至' . date('Y-m-d H:i:s')], 401];
         }
 
-        unset($user['password'], $user['is_lock'], $user['lock_until'], $user['lock_note']);
-
-        if ((new Login)->create_token($user['user_id'], $data['from'], $user) !== true) {
+        unset($user['password'], $user['is_lock'], $user['lock_until'], $user['lock_note'], $user['lock_reason']);
+        $user['login_time'] = time();
+        $user['token']      = md5($user['user_id']);
+        if ((new Login)->create_token($user, $data['from']) !== true) {
             return [['msg' => '网络错误，请联系技术人员解决'], 422];
         }
 
@@ -54,10 +55,11 @@ class Login
 
     public static function wxLogin($data = [])
     {
-
+        //TODO third login logic
+        return true;
     }
 
-    public function create_token($uid, $from, $user)
+    public function create_token($user, $from)
     {
         $redis = $this->redis;
         $allow = array_keys(config('from'));
@@ -65,9 +67,10 @@ class Login
         try {
             //TODO 根据设置选择是否允许多端登录
             foreach ($allow as $index => $item) {
-                $redis->delete($item . '_' . $uid);
+                $redis->delete($item . '_' . $user['token']);
             }
-            $redis->set($from . '_' . $uid, json_encode($user));
+
+            $redis->set($from . '_' . $user['token'], json_encode($user));
             return true;
         } catch (\Exception $e) {
             trace('创建token失败：' . $e->getMessage() . date('Y-m-d H:i:s') . PHP_EOL);
@@ -75,11 +78,19 @@ class Login
         }
     }
 
-    public function del_token($key)
+    public static function checkToken($token, $from)
     {
-        $redis  = $this->redis_connect();
-        $result = $redis->delete($key);
-        return $result;
+        $redis = (new Login)->redis;
+        if ($redis->exists($from . '_' . $token) !== true) {
+            return ['ret' => 1, 'msg' => '请重新登录'];
+        }
+
+        //TODO 增加活动
+        $user = json_decode($redis->get($from . '_' . $token), true);
+        //if (isset($user['ingame']) && $user['ingame'] > 0) {
+        //    return ['ret' => 0, 'data' => $user];
+        //}
+        return ['ret' => 0, 'data' => $user];
     }
 
     private function redis_connect()

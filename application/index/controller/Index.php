@@ -70,9 +70,10 @@ class Index extends Controller
                 break;
             case 2:
                 $result = $this->validate($data, [
-
+                    'from' => ['require', 'regex' => '/(' . $str . ')/'],
                 ], [
-
+                    'from.require' => '登录源不能为空',
+                    'from.regex'   => '登录源错误',
                 ]);
 
                 if ($result !== true) {
@@ -86,4 +87,6 @@ class Index extends Controller
         }
         return json($res[0], $res[1]);
     }
+
+
 }

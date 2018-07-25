@@ -9,6 +9,7 @@
 namespace app\index\controller;
 
 use think\swoole\Server;
+use app\index\logic\Login;
 
 class Swoole extends Server
 {
@@ -29,34 +30,34 @@ class Swoole extends Server
     public function onReceive($server, $fd, $from_id, $data)
     {
         echo "onReceive..." . PHP_EOL;
-        $server->send($fd, 'Swoole: ' . $data);
+        //$server->send($fd, 'Swoole: ' . $data);
     }
 
     public function onOpen($server, $req)
     {
-        $uid = $req->get['uid'];
-        echo $uid.PHP_EOL;
-        $res = [
-            'fd'  => $req->fd,
-            'req' => $req->server['remote_addr'],
-            'uid' => $uid,
-        ];
-        var_dump($req);
+        $token = $req->get['token'];
+        $from  = $req->get['from'];
+
+        $res = Login::checkToken($token, $from);
+        if ($res['ret'] == 1) {
+            $server->close($req->fd);
+        }
         $server->push($req->fd, json_encode($res));
     }
 
     public function onMessage($server, $frame)
     {
-       var_dump( $frame->data);
-        $msg = input('msg', 'no msg');
-        $res = [
+        $msg    = input('msg', 'no msg');
+        $res    = [
             'fd'      => $frame->fd,
             'from_id' => $frame->data,
             'data'    => $frame->data,
             'action'  => 'onMessage',
             'msg'     => $msg
         ];
-        $server->push($frame->fd, json_encode($res));
+
+        $result = (new Game())->indexList();
+        $server->push($frame->fd, json_encode([$res,$result]));
     }
 
     public function onClose($server, $fd)
