@@ -46,7 +46,7 @@ class Game extends Controller
         return $this->indexRedis->get('roomlist');
     }
 
-    public function setList($data)
+    public function setRoomList($data)
     {
         return $this->indexRedis->set('roomlist', json_encode($data));
     }
@@ -65,7 +65,7 @@ class Game extends Controller
 
     public function selectRoom($request)
     {
-        $indexList = json_decode($this->indexList(), true);
+        $indexList = json_decode($this->getRoomList(), true);
         $max       = max(array_column($indexList, 'id'));
         if (!isset($request['room']) || !isset($request['points']) || !is_int($request['room']) || $request['room'] <= 0 || $request['room'] > $max) {
             return ['ret' => 1, 'msg' => '请求参数错误'];
@@ -85,7 +85,7 @@ class Game extends Controller
                     return $result;
                 }
                 $indexList[$index]['count'] += 1;
-                $this->setIndexList($indexList);
+                $this->setRoomList($indexList);
                 $result['ret'] = 0;
                 break;
             }
