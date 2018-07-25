@@ -88,5 +88,8 @@ class Index extends Controller
         return json($res[0], $res[1]);
     }
 
+    public function logout($user_id)
+    {
 
+    }
 }

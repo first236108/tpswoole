@@ -30,7 +30,7 @@ class Login
     public static function phoneLogin($data = [])
     {
         $user = Db::name('users')->where("mobile={$data['phone']}")
-            ->field("user_id,password,sex,last_login,last_ip,mobile,head_pic,nickname,level,code,is_lock,lock_until,lock_reason,token")->find();
+            ->field("user_id,password,sex,last_login,last_ip,mobile,head_pic,nickname,level,code,is_lock,lock_until,lock_reason,token,points")->find();
         if (!$user) {
             return [['msg' => '用户不存在'], 401];
         }
@@ -65,7 +65,6 @@ class Login
         $allow = array_keys(config('from'));
         unset($allow[$from]);
         try {
-            //TODO 根据设置选择是否允许多端登录
             foreach ($allow as $index => $item) {
                 $redis->delete($item . '_' . $user['token']);
             }

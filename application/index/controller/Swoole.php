@@ -34,6 +34,11 @@ class Swoole extends Server
         $this->game = new Game();
     }
 
+    public function onStart($server)
+    {
+        $this->game->clearFd();
+    }
+
     public function onReceive($server, $fd, $from_id, $data)
     {
         echo "onReceive..." . PHP_EOL;
@@ -48,30 +53,54 @@ class Swoole extends Server
         $res = Login::checkToken($token, $from);
         if ($res['ret'] == 1) {
             //$server->close($req->fd);
+        } else {
+            $this->game->setFd($req->fd, $res['data']['user_id']);
+            $server->push($req->fd, json_encode(['ret' => 0]));
         }
-        $mode = $this->game->getMode();
-        $server->push($req->fd, json_encode($mode));
     }
 
     public function onMessage($server, $frame)
     {
-        var_dump(json_decode($frame->data,true));
-        echo '-----' . PHP_EOL;
-        $msg = input('msg', 'no msg');
-        $res = [
-            'fd'      => $frame->fd,
-            'data'    => $frame->data,
-            'action'  => 'onMessage',
-            'msg'     => $msg
-        ];
-        var_dump($res);
-        $result = $this->game->indexList();
-        $server->push($frame->fd, json_encode([$res, $result]));
-    }
+        try {
+            do {
+                $result = ['ret' => 1];
+                if ($frame->finish !== true) {
+                    $result['msg'] = '数据帧错误';
+                    break;
+                }
+                $request = json_decode($frame->data, true);
+                if (!isset($request['mode'])) {
+                    $request['msg'] = '参数错误';
+                    break;
+                }
+                switch ($request['mode']) {
+                    case 'play':
+                        $result = $this->game->play($request);
+                        break;
+                    case 'start':
+                        $result = $this->game->start($request);
+                        break;
+                    case 'quickstart':
+                        $request['ret'] = 0;
+                        $result['data'] = $this->game->getRoomList();
+                        break;
+                    case 'selectroom':
+                        $result = $this->game->selectRoom($request);
+                        break;
+                    case 'contine':
+                        //TODO
+                        $result = $this->game->getRoomList();
+                        break;
+                    default:
+                        $result['msg'] = '非法请求';
+                }
 
-    public function onClose($server, $fd)
-    {
-        echo "onClose..." . PHP_EOL;
+            } while (false);
+
+            $server->push($frame->fd, json_encode($result));
+        } catch (\Exception $e) {
+            trace('onMessageError:' . date('Y-m-d H:i:s') . ' ' . $e->getMessage());
+        }
     }
 
     public function onTask($server, $fd, $from_id, $data)
@@ -83,5 +112,10 @@ class Swoole extends Server
     public function onFinish($server, $task_id, $data)
     {
         echo "onFinish..." . PHP_EOL;
+    }
+
+    public function onClose($server, $fd)
+    {
+        $this->game->delFd($fd);
     }
 }
