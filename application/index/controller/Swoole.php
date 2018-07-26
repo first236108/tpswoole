@@ -52,12 +52,11 @@ class Swoole extends Server
 
         $res = Login::checkToken($token, $from);
         if ($res['ret'] == 1) {
-            $server->push($req->fd, json_encode($res));
             //$server->close($req->fd);
         } else {
             $this->game->setFd($req->fd, $res['data']['user_id']);
-            $server->push($req->fd, json_encode($res));
         }
+        $server->push($req->fd, json_encode($res));
     }
 
     public function onMessage($server, $frame)
