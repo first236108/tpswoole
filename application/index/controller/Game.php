@@ -49,11 +49,12 @@ class Game extends Controller
     {
         $result = [];
         if ($roomKey) {
-            $result = $this->indexRedis->hVals($roomKey);
+            $result = array_combine($this->indexRedis->hkeys($roomKey), $this->indexRedis->hVals($roomKey));
         } else {
             $keys = $this->indexRedis->keys('*');
             foreach ($keys as $index => $key) {
                 $result[] = $this->indexRedis->hGetAll($key);
+                $result[] = array_combine($this->indexRedis->hkeys($key), $this->indexRedis->hVals($key));
             }
         }
         return $result;
