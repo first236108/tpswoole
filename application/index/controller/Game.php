@@ -67,11 +67,12 @@ class Game extends Controller
     {
         $indexList = json_decode($this->getRoomList(), true);
         $max       = max(array_column($indexList, 'id'));
-        if (!isset($request['room']) || !isset($request['points']) || !is_numeric($request['room']) || $request['room'] <= 0 || $request['room'] > $max) {
+        if (!isset($request['room']) || !is_numeric($request['room']) || $request['room'] <= 0 || $request['room'] > $max) {
             return ['ret' => 1, 'msg' => '请求参数错误'];
         }
 
-        $result['ret'] = 1;
+        $request['points'] = Db::name('users')->where('user_id', $this->getFd($fd))->value('points');
+        $result['ret']     = 1;
         foreach ($indexList as $index => $item) {
             if ($item['id'] == $request['room']) {
                 if ($request['points'] < $item['lft']) {
