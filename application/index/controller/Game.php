@@ -41,7 +41,7 @@ class Game extends Controller
         if (!$this->game) {
             if (!isset($count))
                 $count = 3 + $this->indexRedis->dbSize();
-            $this->indexRedis = $this->redis_connect($count);
+            $this->game = $this->redis_connect($count);
         }
     }
 
