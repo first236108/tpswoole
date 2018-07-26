@@ -32,38 +32,53 @@ class Game extends Controller
             $this->indexRedis = $this->redis_connect(1);
         }
 
-        if (!$this->indexRedis->exists('roomlist')) {
-            $list = Db::name('list')->select();
-            $this->indexRedis->set('roomlist', json_encode($list));
-        }
-
         if (!$this->redis) {
-            $count = 3 + count(json_decode($this->getRoomList()));
+            $count = 3 + $this->indexRedis->dbSize();
             for ($i = 2; $i < $count; $i++)
                 $this->redis[$i] = $this->redis_connect($i);
         }
 
         if (!$this->game) {
             if (!isset($count))
-                $count = 3 + count(json_decode($this->getRoomList()));
+                $count = 3 + $this->indexRedis->dbSize();
             $this->indexRedis = $this->redis_connect($count);
         }
     }
 
-    public function getRoomList()
+    public function getRoomList($roomKey = 0)
     {
-        return $this->indexRedis->get('roomlist');
+        $result = [];
+        if ($roomKey) {
+            $result = $this->indexRedis->hVals($roomKey);
+        } else {
+            $keys = $this->indexRedis->keys('*');
+            foreach ($keys as $index => $key) {
+                $result[] = $this->indexRedis->hGetAll($key);
+            }
+        }
+        return $result;
     }
 
-    public function setRoomList($data)
+    public function setRoomList($rooms, $key = '', $field = '', $value = '')
     {
-        return $this->indexRedis->set('roomlist', json_encode($data));
+        if ($key) {
+            $this->indexRedis->hSet($key, $field, $value);
+        } else {
+            foreach ($rooms as $index => $room) {
+                $this->indexRedis->hMSet($room['id'], $room);
+            }
+        }
     }
 
-    public function getMode()
+    public function setRoomCount($room, $num)
     {
-        return $this->indexRedis->get('mode');
+        $this->indexRedis->hIncrBy($room, 'room', $num);
     }
+
+    //public function getMode()
+    //{
+    //    return $this->indexRedis->get('mode');
+    //}
 
     public function play($request)
     {
@@ -74,35 +89,34 @@ class Game extends Controller
 
     public function selectRoom($request, $fd)
     {
-        $indexList = json_decode($this->getRoomList(), true);
-        $max       = max(array_column($indexList, 'id'));
-        if (!isset($request['room']) || !is_numeric($request['room']) || $request['room'] <= 0 || $request['room'] > $max) {
+        if (!isset($request['room']) || !is_numeric($request['room']) || $request['room'] <= 0) {
             return ['ret' => 1, 'msg' => '请求参数错误'];
         }
 
-        $user_id           = $this->getFd($fd);
-        $request['points'] = Db::name('users')->where('user_id', $user_id)->value('points');
-        $result['ret']     = 1;
-        foreach ($indexList as $index => $item) {
-            if ($item['id'] == $request['room']) {
-                if ($request['points'] < $item['lft']) {
-                    $result['ret'] = 1;
-                    $result['msg'] = '你的' . config('pointname') . '不足哦';
-                    return $result;
-                }
-                if ($item['rgt'] != 0 && $item['rgt'] < $request['points']) {
-                    $result['ret'] = 1;
-                    $result['msg'] = '你的' . config('pointname') . '太多了';
-                    return $result;
-                }
-                $indexList[$index]['count'] += 1;
-                Db::name('users')->where('user_id', $this->getFd($fd))->setField('select_room', $request['room']);
-                $this->setRoomList($indexList);
-                $this->setFd($fd, $user_id, $item['id']);
-                $result['ret'] = 0;
-                break;
+        $room          = $this->getRoomList($request['room']);
+        $result['ret'] = 1;
+
+        if ($room['id'] == $request['room']) {
+            $user_id           = $this->getFd($fd);
+            $request['points'] = Db::name('users')->where('user_id', $user_id)->value('points');
+
+            if ($request['points'] < $room['lft']) {
+                $result['ret'] = 1;
+                $result['msg'] = '你的' . config('pointname') . '不足哦';
+                return $result;
             }
+            if ($room['rgt'] != 0 && $room['rgt'] < $request['points']) {
+                $result['ret'] = 1;
+                $result['msg'] = '你的' . config('pointname') . '太多了';
+                return $result;
+            }
+            $room['count'] += 1;
+            Db::name('users')->where('user_id', $this->getFd($fd))->setField('select_room', $request['room']);
+            $this->setRoomList($room, $room['id'], 'count', $room['count'] + 1);
+            $this->setFd($fd, $user_id, $room['id']);
+            $result['ret'] = 0;
         }
+
         if ($result['ret'] > 0)
             $result['msg'] = '选择场次失败';
 
@@ -127,7 +141,7 @@ class Game extends Controller
 
     public function getFd($fd, $room = 0)
     {
-        $ret = $this->redis[2]->hGetAll($fd)['user_id'];
+        $ret = $this->redis[2]->hGetAll($fd);
         if ($room)
             return $ret['room'];
         return $ret['user_id'];
@@ -135,15 +149,8 @@ class Game extends Controller
 
     public function delFd($fd)
     {
-        $data = json_decode($this->getRoomList(), true);
         $room = $this->getFd($fd, true);
-        foreach ($data as $k => $v) {
-            if ($v['id'] == $room) {
-                $data[$k]['count'] -= 1;
-                $this->setRoomList($data);
-                break;
-            }
-        }
+        $this->setRoomCount($room, -1);
         $this->redis[2]->del($fd);
     }
 
@@ -155,9 +162,8 @@ class Game extends Controller
     {
         $this->indexRedis->flushDB();
         $list = Db::name('list')->select();
-        $this->indexRedis->set('roomlist', json_encode($list));
-        $redis = $this->redis_connect(2);
-        return $redis->flushDB();
+        $this->setRoomList($list);
+        return $this->redis[2]->flushDB();
     }
 
     private function redis_connect($db = 1)

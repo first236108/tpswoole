@@ -30,7 +30,7 @@ class Login
     public static function phoneLogin($data = [])
     {
         $user = Db::name('users')->where("mobile={$data['phone']}")
-            ->field("user_id,password,sex,last_login,last_ip,mobile,head_pic,nickname,level,code,is_lock,lock_until,lock_reason,token,points")->find();
+            ->field("user_id,password,sex,last_login,last_ip,mobile,head_pic,nickname,level,code,is_lock,lock_until,lock_reason,token,points,select_room")->find();
         if (!$user) {
             return [['msg' => '用户不存在'], 401];
         }
