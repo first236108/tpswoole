@@ -80,7 +80,7 @@ class Login
     public static function checkToken($token, $from)
     {
         $redis = (new Login)->redis;
-        if ($redis->exists($from . '_' . $token) !== true) {
+        if (!$redis->exists($from . '_' . $token)) {
             return ['ret' => 1, 'msg' => '请重新登录'];
         }
 

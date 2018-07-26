@@ -56,7 +56,7 @@ class Swoole extends Server
             //$server->close($req->fd);
         } else {
             $this->game->setFd($req->fd, $res['data']['user_id']);
-            $server->push($req->fd, json_encode(['ret' => 0]));
+            $server->push($req->fd, json_encode($res));
         }
     }
 

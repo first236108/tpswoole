@@ -71,7 +71,8 @@ class Game extends Controller
             return ['ret' => 1, 'msg' => '请求参数错误'];
         }
 
-        $request['points'] = Db::name('users')->where('user_id', $this->getFd($fd))->value('points');
+        $user_id           = $this->getFd($fd);
+        $request['points'] = Db::name('users')->where('user_id', $user_id)->value('points');
         $result['ret']     = 1;
         foreach ($indexList as $index => $item) {
             if ($item['id'] == $request['room']) {
@@ -88,6 +89,7 @@ class Game extends Controller
                 $indexList[$index]['count'] += 1;
                 Db::name('users')->where('user_id', $this->getFd($fd))->setField('select_room', $request['room']);
                 $this->setRoomList($indexList);
+                $this->redis[2 + $request['room']]->set('fd', $this->$user_id);
                 $result['ret'] = 0;
                 break;
             }
@@ -121,11 +123,12 @@ class Game extends Controller
     }
 
     /**
-     * 清除fd
+     * clear roomList and fd
      * @return bool
      */
     public function clearFd()
     {
+        $this->indexRedis->flushDB();
         $redis = $this->redis_connect(2);
         return $redis->flushDB();
     }
