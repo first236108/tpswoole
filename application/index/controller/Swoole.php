@@ -85,7 +85,7 @@ class Swoole extends Server
                         $result['data'] = $this->game->getRoomList();
                         break;
                     case 'selectroom':
-                        $result = $this->game->selectRoom($request);
+                        $result = $this->game->selectRoom($request, $frame->fd);
                         break;
                     case 'contine':
                         //TODO

@@ -63,11 +63,11 @@ class Game extends Controller
         return $result;
     }
 
-    public function selectRoom($request)
+    public function selectRoom($request, $fd)
     {
         $indexList = json_decode($this->getRoomList(), true);
         $max       = max(array_column($indexList, 'id'));
-        if (!isset($request['room']) || !isset($request['points']) || !is_int($request['room']) || $request['room'] <= 0 || $request['room'] > $max) {
+        if (!isset($request['room']) || !isset($request['points']) || !is_numeric($request['room']) || $request['room'] <= 0 || $request['room'] > $max) {
             return ['ret' => 1, 'msg' => '请求参数错误'];
         }
 
@@ -85,6 +85,7 @@ class Game extends Controller
                     return $result;
                 }
                 $indexList[$index]['count'] += 1;
+                Db::name('users')->where('user_id', $this->getFd($fd))->setField('select_room', $request['room']);
                 $this->setRoomList($indexList);
                 $result['ret'] = 0;
                 break;
