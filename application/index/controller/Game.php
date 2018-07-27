@@ -111,7 +111,7 @@ class Game extends Controller
                 $result['msg'] = '你的' . config('pointname') . '太多了';
                 return $result;
             }
-            $room['count'] += 1;
+
             Db::name('users')->where('user_id', $this->getFd($fd))->setField('select_room', $request['room']);
             $this->setRoomList($room, $room['id'], 'count', $room['count'] + 1);
             $this->setFd($fd, $user_id, $room['id']);
@@ -126,8 +126,8 @@ class Game extends Controller
 
     public function start($request)
     {
-
-        $result = [];
+        var_dump($request);
+        $result = ['data'=>$request];
         return $result;
     }
 

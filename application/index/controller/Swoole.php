@@ -68,6 +68,7 @@ class Swoole extends Server
                     $result['msg'] = '数据帧错误';
                     break;
                 }
+                echo $frame->data->token.PHP_EOL;
                 $request = json_decode($frame->data, true);
                 if (!isset($request['mode'])) {
                     $request['msg'] = '参数错误';
