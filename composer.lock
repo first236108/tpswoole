@@ -8,17 +8,23 @@
     "packages": [
         {
             "name": "topthink/framework",
-            "version": "v5.1.18",
+            "version": "v5.1.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/top-think/framework.git",
-                "reference": "833fcaf0f29f23bdceaae655f64d10c18b9bf562"
+                "reference": "0afab2a8a31de30b59d681fb894fa7b78c24e7b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/top-think/framework/zipball/833fcaf0f29f23bdceaae655f64d10c18b9bf562",
-                "reference": "833fcaf0f29f23bdceaae655f64d10c18b9bf562",
-                "shasum": ""
+                "url": "https://api.github.com/repos/top-think/framework/zipball/0afab2a8a31de30b59d681fb894fa7b78c24e7b9",
+                "reference": "0afab2a8a31de30b59d681fb894fa7b78c24e7b9",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "php": ">=5.6.0",
@@ -55,7 +61,7 @@
                 "orm",
                 "thinkphp"
             ],
-            "time": "2018-07-02T05:29:17+00:00"
+            "time": "2018-10-12T03:31:07+00:00"
         },
         {
             "name": "topthink/think-installer",
@@ -69,7 +75,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/top-think/think-installer/zipball/f5400a12c60e513911aef41fe443fa6920952675",
                 "reference": "f5400a12c60e513911aef41fe443fa6920952675",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "composer-plugin-api": "^1.0"
@@ -100,27 +112,34 @@
         },
         {
             "name": "topthink/think-swoole",
-            "version": "v2.0.8",
+            "version": "v2.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/top-think/think-swoole.git",
-                "reference": "72118702019d24269997e1c40eaf48c82e9e3cb9"
+                "reference": "88287188bf5e8c64bd2ed942005c558be5a6b566"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/top-think/think-swoole/zipball/72118702019d24269997e1c40eaf48c82e9e3cb9",
-                "reference": "72118702019d24269997e1c40eaf48c82e9e3cb9",
-                "shasum": ""
+                "url": "https://api.github.com/repos/top-think/think-swoole/zipball/88287188bf5e8c64bd2ed942005c558be5a6b566",
+                "reference": "88287188bf5e8c64bd2ed942005c558be5a6b566",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-swoole": ">=1.9.5",
-                "topthink/framework": "5.1.*",
+                "topthink/framework": "~5.1.20",
                 "topthink/think-installer": "^2.0"
             },
             "type": "think-extend",
             "extra": {
                 "think-config": {
-                    "swoole": "src/config.php"
+                    "swoole": "src/config.php",
+                    "swoole_server": "src/server_config.php"
                 }
             },
             "autoload": {
@@ -142,7 +161,7 @@
                 }
             ],
             "description": "Swoole extend for thinkphp5.1",
-            "time": "2018-07-04T04:15:23+00:00"
+            "time": "2018-07-28T15:30:17+00:00"
         }
     ],
     "packages-dev": [],
